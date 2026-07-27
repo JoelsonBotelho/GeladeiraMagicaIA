@@ -219,7 +219,6 @@ GeladeiraMagicaIA/
 
 A interface foi desenvolvida com **Thymeleaf** e **CSS customizado**, oferecendo:
 
-![Geladeira Mágica IA](https://via.placeholder.com/800x400?text=Geladeira+Magica+IA+-+Screenshot)
 
 - 🎨 Design moderno com gradiente azul escuro
 - 📱 Layout responsivo (adaptável a dispositivos móveis)
@@ -257,7 +256,7 @@ Desenvolvido por **Joelson Botelho** como projecto de estudo do curso **Java 10x
   <a href="https://github.com/JoelsonBotelho">
     <img src="https://img.shields.io/badge/GitHub-JoelsonBotelho-181717?style=for-the-badge&logo=github" alt="GitHub">
   </a>
-  <a href="https://www.linkedin.com/in/joelson-botelho/">
+  <a href="www.linkedin.com/in/joelson-botelho-221b12253">
     <img src="https://img.shields.io/badge/LinkedIn-Joelson%20Botelho-0A66C2?style=for-the-badge&logo=linkedin" alt="LinkedIn">
   </a>
 </div>
