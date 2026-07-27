@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Geladeira Mágica IA</title>
+
+    <link
+        rel="stylesheet"
+        th:href="@{/css/geladeira.css}"
+    >
+</head>
+
+<body>
+
+<header class="cabecalho">
+    <div>
+        <h1>Geladeira Mágica IA</h1>
+
+        <p>
+            Cadastre seus alimentos e gere receitas com inteligência artificial.
+        </p>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="formulario-card">
+
+        <div class="titulo-secao">
+
+            <div>
+                <span class="icone">+</span>
+            </div>
+
+            <div>
+                <h2>Adicionar alimento</h2>
+                <p>Informe os dados do alimento.</p>
+            </div>
+
+        </div>
+
+        <div
+            class="alerta sucesso"
+            th:if="${param.sucesso}"
+        >
+            Alimento adicionado com sucesso.
+        </div>
+
+        <div
+            class="alerta sucesso"
+            th:if="${param.deletado}"
+        >
+            Alimento removido com sucesso.
+        </div>
+
+        <form
+            th:action="@{/geladeira/adicionar}"
+            th:object="${foodItem}"
+            method="post"
+            class="formulario"
+        >
+
+            <div class="grupo-campos">
+
+                <div class="campo campo-maior">
+
+                    <label for="nome">
+                        Nome do alimento
+                    </label>
+
+                    <input
+                        id="nome"
+                        type="text"
+                        th:field="*{nome}"
+                        placeholder="Ex.: Tomate"
+                        required
+                    >
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="categoria">
+                        Categoria
+                    </label>
+
+                    <select
+                        id="categoria"
+                        th:field="*{categoria}"
+                        required
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        <option value="Frutas">
+                            Frutas
+                        </option>
+
+                        <option value="Vegetais">
+                            Vegetais
+                        </option>
+
+                        <option value="Carnes">
+                            Carnes
+                        </option>
+
+                        <option value="Peixes">
+                            Peixes
+                        </option>
+
+                        <option value="Laticínios">
+                            Laticínios
+                        </option>
+
+                        <option value="Grãos">
+                            Grãos
+                        </option>
+
+                        <option value="Bebidas">
+                            Bebidas
+                        </option>
+
+                        <option value="Outros">
+                            Outros
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="quantidade">
+                        Quantidade
+                    </label>
+
+                    <input
+                        id="quantidade"
+                        type="number"
+                        th:field="*{quantidade}"
+                        min="1"
+                        placeholder="1"
+                        required
+                    >
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="dataValidade">
+                        Data de validade
+                    </label>
+
+                    <input
+                        id="dataValidade"
+                        type="date"
+                        th:field="*{data_validade}"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <button
+                type="submit"
+                class="botao botao-adicionar"
+            >
+                Adicionar alimento
+            </button>
+
+        </form>
+
+    </section>
+
+    <div class="conteudo-principal">
+
+        <section class="alimentos-card">
+
+            <div class="titulo-lista">
+
+                <div>
+                    <h2>Alimentos disponíveis</h2>
+
+                    <p>
+                        Itens cadastrados na sua geladeira.
+                    </p>
+                </div>
+
+                <span
+                    class="contador"
+                    th:text="${#lists.size(alimentos)}"
+                >
+                    0
+                </span>
+
+            </div>
+
+            <div
+                class="lista-vazia"
+                th:if="${#lists.isEmpty(alimentos)}"
+            >
+
+                <div class="icone-vazio">
+                    🧊
+                </div>
+
+                <h3>Nenhum alimento cadastrado</h3>
+
+                <p>
+                    Utilize o formulário acima para adicionar alimentos.
+                </p>
+
+            </div>
+
+            <div
+                class="lista-alimentos"
+                th:unless="${#lists.isEmpty(alimentos)}"
+            >
+
+                <article
+                    class="alimento"
+                    th:each="alimento : ${alimentos}"
+                >
+
+                    <div class="alimento-icone">
+                        🍽️
+                    </div>
+
+                    <div class="alimento-conteudo">
+
+                        <div class="alimento-topo">
+
+                            <h3 th:text="${alimento.nome}">
+                                Tomate
+                            </h3>
+
+                            <span
+                                class="categoria"
+                                th:text="${alimento.categoria}"
+                            >
+                                Vegetais
+                            </span>
+
+                        </div>
+
+                        <div class="alimento-detalhes">
+
+                            <span>
+                                Quantidade:
+
+                                <strong
+                                    th:text="${alimento.quantidade}"
+                                >
+                                    1
+                                </strong>
+                            </span>
+
+                            <span>
+                                Validade:
+
+                                <strong
+                                    th:text="${alimento.data_validade != null
+                                        ? #temporals.format(
+                                            alimento.data_validade,
+                                            'dd/MM/yyyy'
+                                        )
+                                        : 'Não informada'}"
+                                >
+                                    10/08/2026
+                                </strong>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <form
+                        th:action="@{/geladeira/deletar}"
+                        method="post"
+                        class="form-excluir"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="id"
+                            th:value="${alimento.id}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="botao-excluir"
+                            onclick="return confirm('Deseja excluir este alimento?')"
+                        >
+                            Excluir
+                        </button>
+
+                    </form>
+
+                </article>
+
+            </div>
+
+        </section>
+
+        <aside class="receita-card">
+
+            <div class="receita-cabecalho">
+
+                <div class="receita-icone">
+                    ✨
+                </div>
+
+                <div>
+                    <h2>Receita com IA</h2>
+
+                    <p>
+                        Gere uma receita usando os alimentos cadastrados.
+                    </p>
+                </div>
+
+            </div>
+
+            <form
+                th:action="@{/geladeira/gerar-receita}"
+                method="post"
+            >
+
+                <button
+                    type="submit"
+                    class="botao botao-receita"
+                    th:disabled="${#lists.isEmpty(alimentos)}"
+                >
+                    Gerar receita
+                </button>
+
+            </form>
+
+            <div
+                class="mensagem-sem-alimentos"
+                th:if="${#lists.isEmpty(alimentos)}"
+            >
+                Adicione pelo menos um alimento para gerar uma receita.
+            </div>
+
+            <div
+                class="alerta erro"
+                th:if="${erroReceita}"
+                th:text="${erroReceita}"
+            >
+                Não foi possível gerar a receita.
+            </div>
+
+            <div
+                class="resultado-receita"
+                th:if="${receita}"
+            >
+
+                <div class="resultado-titulo">
+                    <span>👨‍🍳</span>
+                    <h3>Receita sugerida</h3>
+                </div>
+
+                <div
+                    id="receitaMarkdown"
+                    class="receita-markdown-fonte"
+                    th:text="${receita}"
+                >
+                    Receita gerada pela inteligência artificial.
+                </div>
+
+                <div
+                    id="receitaFormatada"
+                    class="receita-texto"
+                ></div>
+
+            </div>
+
+            <div
+                class="receita-placeholder"
+                th:unless="${receita}"
+            >
+
+                <div>
+                    🍲
+                </div>
+
+                <p>
+                    A receita gerada será apresentada aqui.
+                </p>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</main>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fonte = document.getElementById("receitaMarkdown");
+        const resultado = document.getElementById("receitaFormatada");
+
+        if (!fonte || !resultado) {
+            return;
+        }
+
+        const markdown = fonte.textContent.trim();
+
+        if (!markdown) {
+            return;
+        }
+
+        const htmlGerado = marked.parse(markdown);
+        const htmlSeguro = DOMPurify.sanitize(htmlGerado);
+
+        resultado.innerHTML = htmlSeguro;
+    });
+</script>
+</body>
+
+</html>
