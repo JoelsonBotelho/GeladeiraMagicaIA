@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import java.util.concurrent.TimeoutException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -14,7 +14,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import dev.java10x.GeladeiraMagicaIA.model.FoodItemModel;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 @Service
 public class ChatGptService {
@@ -95,8 +94,8 @@ public class ChatGptService {
                 )
             ),
             "generationConfig", Map.of(
-                "temperature", 0.7,
-                "maxOutputTokens", 2048
+                "temperature", 0.5,
+                "maxOutputTokens", 800
             )
         );
 
@@ -111,15 +110,18 @@ public class ChatGptService {
             .retrieve()
             .bodyToMono(Map.class)
             .map(this::extractContent)
-            .retryWhen(
-                Retry.backoff(3, Duration.ofSeconds(2))
-                    .maxBackoff(Duration.ofSeconds(10))
-                    .jitter(0.5)
-                    .filter(this::isTemporaryError)
-            )
+            .timeout(Duration.ofSeconds(60))
             .onErrorResume(
                 WebClientResponseException.TooManyRequests.class,
                 this::handleTooManyRequests
+            )
+            .onErrorMap(
+                TimeoutException.class,
+                exception -> new IllegalStateException(
+                    "O Gemini demorou mais de 60 segundos para responder. "
+                        + "Tente novamente.",
+                    exception
+                )
             )
             .onErrorMap(
                 WebClientResponseException.class,
